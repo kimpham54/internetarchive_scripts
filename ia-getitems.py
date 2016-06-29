@@ -11,6 +11,8 @@ def download_new_items(username,password,collection,md5_table, destination, dry_
         md5_table->(String) filename of file containing downloaded files md5 hashes
         destination->(String) folder location to download collection to
 
+        return->(Boolean) True for new files
+
         Checks the collection for new files based off a local file containing md5 hashes.
         Each hash in the md5_table file should be on its own line.
         """
@@ -20,6 +22,7 @@ def download_new_items(username,password,collection,md5_table, destination, dry_
         for line in f:
             downloaded_files.append(line.rstrip("\n")) # remove new line character
 
+    newfiles = False
     ia_collection = get_item(collection) # Get collection to be watched
     for book in ia_collection.contents(): # Cycle through 'books' (Collections in the collection)
         download_book = False # Does the collection contain new files
@@ -33,7 +36,8 @@ def download_new_items(username,password,collection,md5_table, destination, dry_
                  download_book = True
         if download_book:
             download(book.identifier, destdir=destination, dry_run=dry_run) # Dry run for testing purposes
-
+            newfiles = True
+    return newfiles
 
 if __name__ == "__main__":
 
