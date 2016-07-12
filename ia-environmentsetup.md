@@ -26,3 +26,13 @@ In your environment install internetarchive
 To quit your environment
 
 ```$ deactivate```
+
+
+# Redmine integration
+
+To setup the redmine python package
+
+```$ pip install python-redmine```
+
+
+
