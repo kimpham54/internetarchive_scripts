@@ -3,7 +3,7 @@
 # https://archive.org/details/turkishhistoryfr01knol
 
 from internetarchive import get_item, download, search_items,configure
-
+import ia_settings
 def download_new_items(username,password,collection,md5_table, destination, dry_run=False):
     """ username->(String) internet archive user login
         password->(String)
@@ -28,7 +28,7 @@ def download_new_items(username,password,collection,md5_table, destination, dry_
         download_book = False # Does the collection contain new files
         for f in book.files:
             if('md5' in f):
-                if not(f['md5'] in downloaded_files): #  Check for hash in existing table
+                if not(f['md5'] in downloaded_files): #  Check for hash in existing table, this does not cover files that just don't have a hash
                     download_book = True
                     with open(md5_table, "a") as md5_f: # add new hash to table
                         md5_f.write(f['md5'] + "\n")                
@@ -39,17 +39,29 @@ def download_new_items(username,password,collection,md5_table, destination, dry_
             newfiles = True
     return newfiles
 
+def download_single_item(username,password,collection,destination,dry_run=False):
+    thing = get_item(collection)
+    files = []
+    for obj in thing.files:
+        files.append(obj['name'])
+    for obj in files:
+        try:
+            download(collection, files=obj,  destdir=destination, dry_run=dry_run) # Dry run for testing purposes
+        except:
+            print("Failed on:%s"%(obj))
+
 if __name__ == "__main__":
 
-    collection = 'booksgrouptest'
-    username = input("Username(email):")
-    password = input("Password:")
+#collection = 'booksgrouptest'
+    collection = 'eightconceptsofb00gilb'
+    username = ia_settings.ia_username
+    password = ia_settings.ia_password
     md5_table = "test_md5.txt"
     dest="."
 
-    print("Running dry run of download_new_items on %s"%(collection))
-    download_new_items(username,password,collection,md5_table, dest,dry_run=True)
-
+#print("Running dry run of download_new_items on %s"%(collection))
+#    download_new_items(username,password,collection,md5_table, dest,dry_run=True)
+    download_single_item(username,password,collection,dest)
     #book = 'menusfromvarious00unse'
 
     #item = get_item(book) # Gets book of this name
