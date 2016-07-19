@@ -33,10 +33,15 @@ def create_new_book_xml(subtrees):
 
     return root                     # Return new book
 
-def move_file(orig,destfolder):
-    """ The dest folder doesn't include the filename, while orig does"""
+def move_file(orig,dest):
+    """ The dest folder does include the filename, as does orig"""
 
-    shutil.move(orig,destfolder+"/"+orig.split("/")[-1])
+    shutil.move(orig,dest)
+
+def rename_file(old,new):
+    """ Rename a file"""
+
+    shutil.move(old,new)
 
 def untarball(tarfile, dest):
     """Untar a file
@@ -64,11 +69,11 @@ def split_into_folders(tarfile_name,toc,tempfolder="_tmp"):
       
       tarfile -> STRING file name and path of the tarfile to be split into sub folders
       toc -> STRING file name and path of the TOC.xml file to use for splitting the tarfile
-      tempfolder -> path of a temp folder ?
+      tempfolder -> path of a temp folder ? not sure if this is staying TODO
        
        """
 
-    untarball(tarfile_name,tempfolder) # Untar the image files
+    untarball(tarfile_name,tempfolder) # Untar the image files, and create the temp folder
 
     files = glob.glob(tempfolder+"/*.jp2") # Get a list of the image files that have been uncompressed
 
@@ -80,6 +85,33 @@ def split_into_folders(tarfile_name,toc,tempfolder="_tmp"):
             # Up count of some sort? 
             pass # POP image into directory?
 
+def create_mods_file(xmltree,folder):
+    """ Generates a MODS.xml file in the specified folder from the given xmltree """
+
+    tree = ET.ElementTree()
+    if(type(xmltree) != type(tree)):
+        tree._setroot(xmltree)
+        tree.write(folder+"/MODS.xml")
+    else:
+        xmltree.write(folder+"/MODS.xml")
+
+def make_folder_into_compound(folder,ext=".jp2"):
+    """ Turn a folder containing ext type files
+        folder -> files
+        into
+        folder->firstchild->OBJ.jp2,secondchild->OBJ.jp2
+        according to the islandor compound batch tool
+        """
+
+    files = glob.glob(folder+"/*"+ext) # Get list of files of the specified type in the folder
+    padding = len(str(len(files))) # This makes sure that they will be ordered
+    folders = create_dest_folders(folder+"/compound_",0,len(files),padding) # Create dest folders
+    for a in range(0,len(files)):
+        move_file(files[a],folders[a]+"/OBJ.jp2") # Move and rename the files into their respective folder
+        # GET META DATA
+        # TODO Create MOD file here
+    # Create the overall MOD file?
+
 
 if __name__ == "__main__":
     
@@ -89,8 +121,12 @@ if __name__ == "__main__":
 #    split_into_folders("testarchive/testarchive.tar","TOC.xml","newarchive")
 #    move_file("testarchive/testfile.txt","newarchive")
 
-#    create_dest_folders("bleh",0,11,0)
+#    create_dest_folders("/Users/armst179/workspace/internetarchive_scripts/bleh",0,11,0)
+
+# make_folder_into_compound("newarchive")
 
 
-
+    root = ET.Element("blerg")
+    create_mods_file(root,"newarchive")
     pass
+    

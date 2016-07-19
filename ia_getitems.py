@@ -4,6 +4,29 @@
 
 from internetarchive import get_item, download, search_items,configure
 import ia_settings
+
+def check_for_new_items(username,password,collection,collections_db):
+    """Checks if there is a new group of scans in the collection from a list in a text file"""
+
+    configure(username,password) # Configure log in information for IA
+    downloaded_collections = []
+    with open(collections_db) as f:
+        for line in f:
+            downloaded_collections.append(line.rstrip("\n"))
+    new_collections = []
+    for book in get_item(collection).contents():
+        if(book.identifier not in downloaded_collections):
+            new_collections.append(book.identifier)
+    return new_collections
+
+def add_item_to_db(collections_db,new_items):
+    """Once items have been processed, they can be added to the collections database of downloaded collections"""
+
+    with open(collections_db,"a") as f:
+        for new_col in new_items:
+            f.write(new_col +"\n")
+
+
 def download_new_items(username,password,collection,md5_table, destination, dry_run=False):
     """ username->(String) internet archive user login
         password->(String)
@@ -49,6 +72,12 @@ def download_single_item(username,password,collection,destination,dry_run=False)
             download(collection, files=obj,  destdir=destination, dry_run=dry_run) # Dry run for testing purposes
         except:
             print("Failed on:%s"%(obj))
+
+def download_collection(username,password,collection,destination,dry_run=False):
+
+    configure(username,password)
+    download(collection,destdir=dectionation,dry_run=dry_run)
+
 
 if __name__ == "__main__":
 
