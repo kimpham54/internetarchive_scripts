@@ -5,14 +5,14 @@
 #
 
 import ia_getitems, ia_split, ia_redmine, ia_settings
-
+import sys
 # **************************
 
 # **************************
 
-downloaded_path = "harley_spiller_downloaded/"
-preprocess_path = "harley_spiller_preprocess/"
-processed_path = "harley_spiller_processed/"
+downloaded_path = "testarchive/harley_spiller_downloaded/"
+preprocess_path = "testarchive/harley_spiller_preprocess/"
+processed_path = "testarchive/harley_spiller_processed/"
 
 # **************************
 # CHECK FOR NEW COLLECTIONS
@@ -21,11 +21,12 @@ processed_path = "harley_spiller_processed/"
 collection_id = 'booksgrouptest' # The collection to watch
 collections_db = 'harley_spiller_collections.txt' # The text file containing the subcollection (scan boxs, books?) that have already been processed
 
-new_collections = ia_getitems.check_for_new_items(ia_settings.ia_username,ia_settings.ia_password,collection_id,collections_db)
+#new_collections = ia_getitems.check_for_new_items(ia_settings.ia_username,ia_settings.ia_password,collection_id,collections_db)
+new_collections = ['menusfromvarious00unse']
 
-if (len(new_colllections) == 0):
+if (len(new_collections) == 0):
     # No new collections to process!
-    return
+    sys.exit("No new collections")
 
 ia_split.new_folders(downloaded_path,new_collections) # Prep folders for the download data
 
@@ -34,9 +35,10 @@ ia_split.new_folders(downloaded_path,new_collections) # Prep folders for the dow
 # **************************
 
 dry_run=False
+#dry_run=True
 
 for col in new_collections:
-    ia_getitems.download_collection(ia_settings.ia_username,ia_settings.ia_password,col,download_path,dry_run) # Download new collections
+    ia_getitems.download_collection(ia_settings.ia_username,ia_settings.ia_password,col,downloaded_path,dry_run) # Download new collections
 
 # **************************
 # UNTAR the jp2 archive
@@ -47,8 +49,9 @@ tocfile = "_scandata.xml" # TODO This probably isn't right
 ia_split.new_folders(preprocess_path,new_collections) # New folders to uncompress into
 
 for col in new_collections:
-    ia_split.untarball(download_path+"/"+col,preprocess_path + col)
-    ia_split.move_file(download_path+"/"+col+"/"+col+tocfile,preprocess_path+"/"+col+"/"+col+tocfile)
+    tarfile_name = ia_split.get_tarname(downloaded_path+"/"+col)
+    ia_split.untarball(tarfile_name,preprocess_path + col)
+    ia_split.move_file(downloaded_path+"/"+col+"/"+col+tocfile,preprocess_path+"/"+col+"/"+col+tocfile)
 
 # **************************
 # Split the archive into multiple folders and move the jp2 files
@@ -57,7 +60,8 @@ for col in new_collections:
 
 ia_split.new_folders(processed_path,new_collections) # New folders to uncompress into
 for col in new_collections:
-    ia_split.make_folder_into_compound(preprocess_path,processed_path) # TODO THERE IS MODS STUFF TO DO HERE
+    tarfile_name = ia_split.get_tarname(downloaded_path+"/"+col).split("/")[-1]
+    ia_split.make_folder_into_compound(preprocess_path+"/"+col+"/"+tarfile_name.rstrip(".tar"),processed_path+"/"+col) # TODO THERE IS MODS STUFF TO DO HERE
 
 # **************************
 # Islandora stuff?
@@ -70,13 +74,12 @@ for col in new_collections:
 redmine_url = "https://digitalscholarship.utsc.utoronto.ca/redmine/"
 #project_id = "digital-collections-working-group"
 project_id = "kim-pham"
-issue_subject = "Harley-Spiller Collection new items"
+issue_subject = "TEST Harley-Spiller Collection new items TEST"
 assign_to = "cadenarmstrong"
-print(new_collections)
 issue_description = "The following items are new and have been processed:\n"
 for col in new_collections:
     issue_description += col + "\n"
-ia_redmine.create_redmine_issue(ia_settings.redmine_username,ia_settings.redmine_password,redmine_url,project_id,issue_subject,issue_description)
+#ia_redmine.create_redmine_issue(ia_settings.redmine_username,ia_settings.redmine_password,redmine_url,project_id,issue_subject,issue_description,assign_to)
 
 # **************************
 # SAVE COLLECTIONS TO DATABASE

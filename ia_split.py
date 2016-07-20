@@ -49,6 +49,11 @@ def untarball(tarfile, dest):
     call(['mkdir','-p',dest])
     call(['tar','-xzf',tarfile,"-C",dest])
 
+def get_tarname(path):
+    """ Gets the name of the tarfile in the directory"""
+
+    return glob.glob(path+"/*.tar")[0]
+
 def create_dest_folders(name,range_start,range_end,padding):
     """ Range_start inclusive, range_end exclusive
         padding is zero padding on the number
@@ -105,7 +110,7 @@ def make_folder_into_compound(folder,destination,ext=".jp2"):
     padding = len(str(len(files))) # This makes sure that they will be ordered
     folders = create_dest_folders(destination+"/compound_",0,len(files),padding) # Create dest folders
     for a in range(0,len(files)):
-        move_file(files[a],destination[a]+"/OBJ.jp2") # Move and rename the files into their respective folder
+        move_file(files[a],folders[a]+"/OBJ.jp2") # Move and rename the files into their respective folder
         # GET META DATA
         # TODO Create MOD file here
     # Create the overall MOD file?

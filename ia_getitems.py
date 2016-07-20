@@ -76,7 +76,7 @@ def download_single_item(username,password,collection,destination,dry_run=False)
 def download_collection(username,password,collection,destination,dry_run=False):
 
     configure(username,password)
-    download(collection,destdir=dectionation,dry_run=dry_run)
+    download(collection,destdir=destination,dry_run=dry_run)
 
 
 if __name__ == "__main__":
