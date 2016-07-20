@@ -64,8 +64,8 @@ def create_dest_folders(name,range_start,range_end,padding):
         folders.append(name+number_format%(a))
     return folders
 
-def split_into_folders(tarfile_name,toc,tempfolder="_tmp"):
-    """Untar the tarball file and using the table of contents, split the tarfile into multiple folders
+def split_into_folders(tarfile_name,toc,dest_folder="_tmp"):
+    """Using the table of contents, split the tarfile into multiple folders
       
       tarfile -> STRING file name and path of the tarfile to be split into sub folders
       toc -> STRING file name and path of the TOC.xml file to use for splitting the tarfile
@@ -73,10 +73,8 @@ def split_into_folders(tarfile_name,toc,tempfolder="_tmp"):
        
        """
 
-    untarball(tarfile_name,tempfolder) # Untar the image files, and create the temp folder
 
-    files = glob.glob(tempfolder+"/*.jp2") # Get a list of the image files that have been uncompressed
-
+    files = glob.glob(dest_folder+"/*.jp2") # Get a list of the image files that have been uncompressed
 
     
     toc = ET.parse(xmlfile)                             # Open the TOC to  read for splitting
@@ -95,7 +93,7 @@ def create_mods_file(xmltree,folder):
     else:
         xmltree.write(folder+"/MODS.xml")
 
-def make_folder_into_compound(folder,ext=".jp2"):
+def make_folder_into_compound(folder,destination,ext=".jp2"):
     """ Turn a folder containing ext type files
         folder -> files
         into
@@ -105,13 +103,21 @@ def make_folder_into_compound(folder,ext=".jp2"):
 
     files = glob.glob(folder+"/*"+ext) # Get list of files of the specified type in the folder
     padding = len(str(len(files))) # This makes sure that they will be ordered
-    folders = create_dest_folders(folder+"/compound_",0,len(files),padding) # Create dest folders
+    folders = create_dest_folders(destination+"/compound_",0,len(files),padding) # Create dest folders
     for a in range(0,len(files)):
-        move_file(files[a],folders[a]+"/OBJ.jp2") # Move and rename the files into their respective folder
+        move_file(files[a],destination[a]+"/OBJ.jp2") # Move and rename the files into their respective folder
         # GET META DATA
         # TODO Create MOD file here
     # Create the overall MOD file?
 
+def new_folders(parent_path, folder_names):
+    """Makes directories with names in folder_names (list), inside of parent_path path"""
+
+
+    if(parent_path[-2:-1] != "/"):
+        parent_path += "/"
+    for folder in folder_names:
+        call(['mkdir','-p',parent_path + folder]) # Makes the full path if it doesn't exist (yes this includes the parent)
 
 if __name__ == "__main__":
     
@@ -125,8 +131,9 @@ if __name__ == "__main__":
 
 # make_folder_into_compound("newarchive")
 
+#    new_folders("blergfolder/",['glergfolder'])
 
-    root = ET.Element("blerg")
-    create_mods_file(root,"newarchive")
+#    root = ET.Element("blerg")
+#    create_mods_file(root,"newarchive")
     pass
     
