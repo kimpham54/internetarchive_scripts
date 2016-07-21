@@ -60,10 +60,13 @@ for col in new_collections:
 # Also generate the MODS files
 # **************************
 
+modspath = "MODS/"
+
 ia_split.new_folders(processed_path,new_collections) # New folders to uncompress into
 for col in new_collections:
     tarfile_name = ia_split.get_tarname(downloaded_path+"/"+col).split("/")[-1]
-    ia_split.make_folder_into_compound(preprocess_path+"/"+col+"/"+tarfile_name.rstrip(".tar"),processed_path+"/"+col) # TODO THERE IS MODS STUFF TO DO HERE
+    scandata = ia_split.get_scandata(downloaded_path+"/"+col)
+    ia_split.make_folder_into_compound(preprocess_path+"/"+col+"/"+tarfile_name.rstrip(".tar"),processed_path+"/"+col,modspath,scandata) # TODO THERE IS MODS STUFF TO DO HERE
 
 # **************************
 # Islandora stuff?

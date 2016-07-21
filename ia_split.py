@@ -54,6 +54,12 @@ def get_tarname(path):
 
     return glob.glob(path+"/*.tar")[0]
 
+def get_scandata(path):
+    """ Gets the name of the tarfile in the directory"""
+
+    return glob.glob(path+"/*scandata.xml")[0]
+
+
 def create_dest_folders(name,range_start,range_end,padding):
     """ Range_start inclusive, range_end exclusive
         padding is zero padding on the number
@@ -98,7 +104,7 @@ def create_mods_file(xmltree,folder):
     else:
         xmltree.write(folder+"/MODS.xml")
 
-def make_folder_into_compound(folder,destination,ext=".jp2"):
+def make_folder_into_compound(folder,destination,modspath,scandata,ext=".jp2"):
     """ Turn a folder containing ext type files
         folder -> files
         into
@@ -108,12 +114,35 @@ def make_folder_into_compound(folder,destination,ext=".jp2"):
 
     files = glob.glob(folder+"/*"+ext) # Get list of files of the specified type in the folder
     padding = len(str(len(files))) # This makes sure that they will be ordered
-    folders = create_dest_folders(destination+"/compound_",0,len(files),padding) # Create dest folders
-    for a in range(0,len(files)):
-        move_file(files[a],folders[a]+"/OBJ.jp2") # Move and rename the files into their respective folder
-        # GET META DATA
-        # TODO Create MOD file here
-    # Create the overall MOD file?
+
+    identifier_leafNums = scandata_leafnums(scandata)
+    leafNums = []
+    for a in range(0,identifier_leafNums.keys()):
+        leafNums.append(int(identifier_leafNums[identifier_leafNums.keys()[a]]))
+    leafNums += [len(files)]
+    menuSizes = []
+    for a in range(0,len(leafNums)-1):
+        menuSize.append(leafNums[a+1]-leafNums[a])
+    leafCount = 0
+    for a in range(0,identifier_leafNums.keys()):
+        leafCount += 1
+        identifier = identifier_leafNums.keys()[a]
+        folders = create_dest_folders(destination+"/"+identifier+"/compound_",0,menuSize[a],padding) # Create dest folders
+        for a in range(0,len(folders)):
+            move_file(files[leafCount],folders[a]+"/OBJ.jp2") # Move and rename the files into their respective folder
+            modfile = find_mods(modspath,identifier)
+            copy_file(modfile,folders[leafCount]+"/MODS.xml")
+    # TODO MOD file?
+
+def scandata_leafnums(scandata)
+    """ Goes through a scandata file and makes a dict for identifiers and leafnum index"""
+
+    leafnums = {}
+    tree = ET.parse(scandata)
+    root = tree.getroot()
+    for item in root: # TODO update structure
+        leafnums[item.find('title').text] = int(item.attrib['leafNum']) # TODO update structure
+    return leafnums
 
 def new_folders(parent_path, folder_names):
     """Makes directories with names in folder_names (list), inside of parent_path path"""
@@ -123,6 +152,22 @@ def new_folders(parent_path, folder_names):
         parent_path += "/"
     for folder in folder_names:
         call(['mkdir','-p',parent_path + folder]) # Makes the full path if it doesn't exist (yes this includes the parent)
+
+def copy_file(start,finish):
+    """ Wrapper for shutil copy"""
+
+   shutil.copy(start,finish) 
+
+def get_scan_identifier(scandata,leafnum):
+    """ TODO: return the identifier for the given leaf number """
+
+    tree = ET.parse(scandata)
+    root = tree.getroot()
+    for item in root:
+        if(item.find("leafNum")):
+            return item.identifier
+    # TODO Restructure as needed
+
 
 def find_mods(mods_dir,identifier):
     """ Look for a mods file in the mods_dir of a given identifier. 
