@@ -35,10 +35,12 @@ ia_split.new_folders(downloaded_path,new_collections) # Prep folders for the dow
 # **************************
 
 dry_run=False
+globs = ['*.tar','*scandata.xml']
 #dry_run=True
 
 for col in new_collections:
-    ia_getitems.download_collection(ia_settings.ia_username,ia_settings.ia_password,col,downloaded_path,dry_run) # Download new collections
+    for g in globs:
+        ia_getitems.download_collection(ia_settings.ia_username,ia_settings.ia_password,col,downloaded_path,glob=g,dry_run=dry_run) # Download new collections
 
 # **************************
 # UNTAR the jp2 archive

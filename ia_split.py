@@ -124,6 +124,19 @@ def new_folders(parent_path, folder_names):
     for folder in folder_names:
         call(['mkdir','-p',parent_path + folder]) # Makes the full path if it doesn't exist (yes this includes the parent)
 
+def find_mods(mods_dir,identifier):
+    """ Look for a mods file in the mods_dir of a given identifier. 
+        Returns a path to the MODS files"""
+
+    files = glob.glob(mods_dir+"*.xml") # Get list of files in the directory given
+    for f in files: # lets look at the all the files
+        tree = ET.parse(f) # Open the file as an xml tree, lets make like a treet and....split :D
+        root = tree.getroot()
+        for child in root:
+            if 'identifier' in child.tag and child.text == identifier: # TODO Test with actual files
+                 return f # correct file found, return the path
+        
+
 if __name__ == "__main__":
     
 #    split_by_chapter("eightconceptsofb00gilb/eightconceptsofb00gilb_scandata.xml")
@@ -140,5 +153,8 @@ if __name__ == "__main__":
 
 #    root = ET.Element("blerg")
 #    create_mods_file(root,"newarchive")
+
+#print(find_mods("MODS/",""))
+
     pass
     
