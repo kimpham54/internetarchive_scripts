@@ -22,12 +22,12 @@ def csv_row_to_mods(csv_row,csv_defs,dest):
 
 
     name = SubElement(mods,'name')
-    name.attrib['type'] = meta['type']
+    name.attrib['type'] = "personal" # Hardcoded
     namepartname = SubElement(name,'namePart')
-    namepartname.text = meta['name']
+    namepartname.text = "Spiller, Harley J."
     namepartdate = SubElement(name,'namePart')
     namepartdate.attrib['type']='date'
-    namepartdate.text = meta['date']
+    namepartdate.text = "1959-"
 
     role = SubElement(name,'role')
     rolepart = SubElement(role,'roleTerm')
@@ -36,17 +36,14 @@ def csv_row_to_mods(csv_row,csv_defs,dest):
     rolepart.attrib['type'] = "text"
 
     typeofresource= SubElement(mods,'typeOfResource')
-    typeofresource.text = meta['typeOfResource']
+    typeofresource.text = "text"
 
     genre = SubElement(mods,'genre')
-    genre.attrib['authority'] = "lctgm"
-    genre.text = meta['genre']
+    genre.text = "textual record"
 
     origininfo = SubElement(mods,'originInfo')
     datecaptured = SubElement(origininfo,'dateCaptured')
     datecaptured.text = meta['dateCaptured']
-    publisher = SubElement(origininfo,'publisher') # TODO
-    # TODO PLACE AND PLACE TERM
     datecreated = SubElement(origininfo, 'dateCreated')
     datecreated.attrib['qualifier'] = meta['dateQualifier']
     datecreated.text = meta['dateCreated']
@@ -97,6 +94,7 @@ def csv_row_to_mods(csv_row,csv_defs,dest):
     region = SubElement(hierarchicalgeographic,'region') #TODO blank?
     county = SubElement(hierarchicalgeographic,'county') #TODO blank?
     city = SubElement(hierarchicalgeographic,'city') #TODO blank?
+    city.text = meta['city'] 
     citysection= SubElement(hierarchicalgeographic,'citySection') #TODO blank?
     cartographics = SubElement(subject,'cartographics')
     coordinates = SubElement(cartographics,'coordinates')
@@ -106,14 +104,13 @@ def csv_row_to_mods(csv_row,csv_defs,dest):
     location = SubElement(mods,'location')
     holdinginstitution = SubElement(location,'physicalLocation')
     holdinginstitution.attrib['type'] = "holdingInstitution"
-    holdinginstitution.text = meta['holdingInstitution']
+    holdinginstitution.text = "University of Toronto Scarborough Library, Archives & Special Collections"
     source = SubElement(location,'physicalLocation')
     source.attrib['type'] = "source"
     source.text = meta['source']
     
     accesscondition = SubElement(mods,'accessCondition') # Rights
-    accesscondition.text = meta['rights']
-
+    accesscondition.text = "Digital files found on the Digital Scholarship Unit site are meant for research and private study used in compliance with copyright legislation. Access to digital images and text found on this website and the technical capacity to download or copy it does not imply permission to re-use. Prior written permission to publish, or otherwise use images and text found on the website must be obtained from copyright holder. Please contact holding institution for further information."
 
 
     tree = ET.ElementTree(mods)
@@ -126,7 +123,7 @@ if __name__ == "__main__":
 #    defs = ['k1','k2']
 #    dest = "."
     dest = "testarchive/MODS.xml"
-    reader = csv.reader(codecs.open("006-1-4-5-1.csv",encoding="latin-1")) # TODO TEXT ENCODING
+    reader = csv.reader(codecs.open("006-1-4-5-1test.csv",encoding="utf-8")) # TODO TEXT ENCODING
     read_defs = False
     defs = []
     for row in reader:
