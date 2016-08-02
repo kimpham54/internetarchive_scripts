@@ -7,7 +7,10 @@ def create_redmine_issue(username,password,redmine_url,project_id,issue_subject,
         project_id ->(String) name of project
         issue_subject ->(String) issue subject
         issue_description ->(String) description of issue
-        assign_to ->(String) id of the person the task is assigned to"""
+        assign_to ->(String) id of the person the task is assigned to
+      
+        Creates a new issue/ticket on redmine for the given information.
+       """
 
     redmine = Redmine(redmine_url,username=username,password=password)
     redmine.issue.create(project_id=project_id,subject=issue_subject,description=issue_subject,assigned_to_id=assign_to)
