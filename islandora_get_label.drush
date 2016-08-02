@@ -1,0 +1,12 @@
+#!/usr/bin/env drush
+
+$pid = drush_shift();
+
+$object = islandora_object_load($pid);
+
+if(!$object){
+	return;
+}
+
+echo $object->label."\n";
+
