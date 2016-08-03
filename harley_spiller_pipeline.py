@@ -22,8 +22,8 @@ processed_path = "testarchive/harley_spiller_processed/"
 collection_id = 'booksgrouptest' # The collection to watch
 collections_db = 'harley_spiller_collections.txt' # The text file containing the subcollection (scan boxs, books?) that have already been processed
 
-new_collections = ia_getitems.check_for_new_items(ia_settings.ia_username,ia_settings.ia_password,collection_id,collections_db)
-#new_collections = ['menusfromvarious00unse']
+#new_collections = ia_getitems.check_for_new_items(ia_settings.ia_username,ia_settings.ia_password,collection_id,collections_db)
+new_collections = ['spiller_006-1-4-3-21']
 
 if (len(new_collections) == 0):
     # No new collections to process!
@@ -46,7 +46,7 @@ for col in new_collections:
 # UNTAR the jp2 archive
 # **************************
 
-tocfile = "_scandata.xml" # TODO This probably isn't right
+tocfile = "_scandata.xml" 
 
 ia_split.new_folders(preprocess_path,new_collections) # New folders to uncompress into
 
@@ -61,12 +61,14 @@ for col in new_collections:
 # **************************
 
 modspath = "MODS/"
+tocpath = "TOC/"
 
 ia_split.new_folders(processed_path,new_collections) # New folders to uncompress into
 for col in new_collections:
+    toc = ia_split.get_toc(tocpath,col.split("_")[1])
     tarfile_name = ia_split.get_tarname(downloaded_path+"/"+col).split("/")[-1]
     scandata = ia_split.get_scandata(downloaded_path+"/"+col)
-    ia_split.make_folder_into_compound(preprocess_path+"/"+col+"/"+tarfile_name.rstrip(".tar"),processed_path+"/"+col,modspath,scandata) # TODO THERE IS MODS STUFF TO DO HERE
+    ia_split.make_folder_into_compound(preprocess_path+"/"+col+"/"+tarfile_name.rstrip(".tar"),processed_path+"/"+col,modspath,scandata,toc) 
 
 
 # **************************
@@ -121,3 +123,10 @@ for a in range(0,len(labels)):
 
 ia_getitems.add_item_to_db(collections_db,new_collections)
 
+# **************************
+# CLEAN UP THE DOWNLOAD AND PROCESS FOLDERS
+# **************************
+
+subprocess.call(['rm','-rf',downloaded_path])
+subprocess.call(['rm','-rf',preprocess_path])
+subprocess.call(['rm','-rf',processed_path])
