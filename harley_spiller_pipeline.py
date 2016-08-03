@@ -126,6 +126,6 @@ ia_getitems.add_item_to_db(collections_db,new_collections)
 # CLEAN UP THE DOWNLOAD AND PROCESS FOLDERS
 # **************************
 
-subprocess.call(['rm','-rf',downloaded_path])
-subprocess.call(['rm','-rf',preprocess_path])
-subprocess.call(['rm','-rf',processed_path])
+#subprocess.call(['rm','-rf',downloaded_path])
+#subprocess.call(['rm','-rf',preprocess_path])
+#subprocess.call(['rm','-rf',processed_path])
