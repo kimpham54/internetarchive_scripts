@@ -60,7 +60,6 @@ for col in new_collections:
 # Also generate the MODS files
 # **************************
 
-modspath = "MODS/"
 tocpath = "TOC/"
 
 ia_split.new_folders(processed_path,new_collections) # New folders to uncompress into
@@ -68,7 +67,7 @@ for col in new_collections:
     toc = ia_split.get_toc(tocpath,col.split("_")[1])
     tarfile_name = ia_split.get_tarname(downloaded_path+"/"+col).split("/")[-1]
     scandata = ia_split.get_scandata(downloaded_path+"/"+col)
-    ia_split.make_folder_into_compound(preprocess_path+"/"+col+"/"+tarfile_name.rstrip(".tar"),processed_path+"/"+col,modspath,scandata,toc) 
+    ia_split.make_folder_into_compound(preprocess_path+"/"+col+"/"+tarfile_name.rstrip(".tar"),processed_path+"/"+col,scandata,toc) 
 
 
 # **************************

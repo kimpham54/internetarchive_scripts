@@ -31,22 +31,31 @@ def untarball(tarfile, dest):
     call(['tar','-xzf',tarfile,"-C",dest])
 
 def get_tarname(path):
-    """ Gets the name of the tarfile in the directory"""
+    """path->(String) directory path 
+        
+        Gets the full path of the first tarfile in the directory with .tar extension"""
 
     return glob.glob(path+"/*.tar")[0]
 
 def get_scandata(path):
-    """ Gets the name of the tarfile in the directory"""
+    """path->(String)
+       
+        Gets the full pathof a file *scandata.xml in the directory"""
 
     return glob.glob(path+"/*scandata.xml")[0]
 
 def create_dest_folders(name,range_start,range_end,padding):
-    """ Range_start inclusive, range_end exclusive
+    """name->(String) full path of folders to create minus the numbering
+       range_start->(int) first number in folder naming range
+       range_end->(int) the end of the range of folder naming
+       padding->(int) size of zero padding in the name, ex 4 -> XXXX so 0023
+
+        create a series of folders with nameXXX
+        Range_start inclusive, range_end exclusive
         padding is zero padding on the number
         ex. 001 is 3, 0001 is 4...etc
 
-        returns the list of folders created
-    """
+        returns the list of folders created"""
 
     number_format = "%0"+str(padding)+"d"
     folders = []
@@ -56,7 +65,10 @@ def create_dest_folders(name,range_start,range_end,padding):
     return folders
 
 def create_mods_file(xmltree,folder):
-    """ Generates a MODS.xml file in the specified folder from the given xmltree """
+    """xmltree->(ElementTree) modsfile element tree
+       folder->(String) path to folder where MODS file will be written
+       
+        Generates a MODS.xml file in the specified folder from the given xmltree """
 
     tree = ET.ElementTree()
     if(type(xmltree) != type(tree)):
@@ -65,12 +77,19 @@ def create_mods_file(xmltree,folder):
     else:
         xmltree.write(folder+"/MODS.xml")
 
-def make_folder_into_compound(folder,destination,modspath,scandata,toc,ext=".jp2"):
-    """ Turn a folder containing ext type files
+def make_folder_into_compound(folder,destination,scandata,toc,ext=".jp2"):
+    """folder->(String) path to folder containing files to make into compounds
+       destination->(String) path to folder where compounds will be made
+       scandata->(String) path to scandata file containing leaf nums and menu splitting
+       toc->(String) path to table of contents text file
+       (OPT)ext->(String) file extension for files to split into compound
+        
+        Turn a folder containing ext type files
         folder -> files
         into
         folder->firstchild->OBJ.jp2,secondchild->OBJ.jp2
         according to the islandor compound batch tool
+        with mods files generated as well
         """
 
     files = glob.glob(folder+"/*"+ext) # Get list of files of the specified type in the folder
@@ -93,7 +112,11 @@ def make_folder_into_compound(folder,destination,modspath,scandata,toc,ext=".jp2
         copy_file(folders[0]+"/MODS.xml",destionation+"/"+identifier+"/MODS.xml")
 
 def scandata_leafnums(scandata):
-    """ Goes through a scandata file and make a nested list of leaf nums """
+    """scandata->(String) path to scandata file 
+        
+       returns a nested list in the form [[1,2,3],[4,5]] etc
+       Goes through a scandata file and make a nested list of leaf nums.
+       New menus split on "Chapter" pagetype and only "Normal" and "Chapter" pagetypes are added"""
 
     leafnums = []
     tree = ET.parse(scandata)
@@ -119,6 +142,11 @@ def copy_file(start,finish):
     shutil.copy(start,finish) 
 
 def generate_mods(metapath,identifier,dest):
+    """metapath->(String) path to directory contating meta data files
+       indentifier->(String) Identifier to be made into a mod file
+       dest->(String) Destination path of folder for MODS.xml file to be put into
+
+       generate a MODS.xml file from a csv meta data file for a given identifier"""
 
     files = glob.glob(metapath+"*.xml") # Get list of files in the directory given
     for f in files: # lets look at the all the files
@@ -132,6 +160,10 @@ def generate_mods(metapath,identifier,dest):
                     csv_to_mods.csv_row_to_mods(row,key,dest)
 
 def get_toc(path,boxid):
+    """path->(String) path to directory containing table of contents
+       boxid->(String) box id for group of scans (also filename of TOC file)
+
+       returns list of identifiers for the given box""" 
     
     toc = []
     with open(path+"/"+boxid+".txt") as f:
