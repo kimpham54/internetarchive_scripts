@@ -1,15 +1,19 @@
 from redmine import Redmine
 
-def create_redmine_issue(username,password,redmine_url,project_id,issue_subject,issue_description):
+def create_redmine_issue(username,password,redmine_url,project_id,issue_subject,issue_description,assign_to):
     """Create and save a new issue on redmine
         username ->(String) authentication info for redmine
         password ->(String) authentication info for redmine
         project_id ->(String) name of project
         issue_subject ->(String) issue subject
-        issue_description ->(String) description of issue"""
+        issue_description ->(String) description of issue
+        assign_to ->(String) id of the person the task is assigned to
+      
+        Creates a new issue/ticket on redmine for the given information.
+       """
 
     redmine = Redmine(redmine_url,username=username,password=password)
-    redmine.issue.create(project_id=project_id,subject=issue_subject,description=issue_subject)
+    redmine.issue.create(project_id=project_id,subject=issue_subject,description=issue_subject,assigned_to_id=assign_to)
 
 
 if __name__ == "__main__":
